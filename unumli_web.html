@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unumli</title>
+  <style>
+    :root {
+      --app: #f3f4f6;
+      --sidebar: #eceef1;
+      --content: #fbfbfa;
+      --surface: #ffffff;
+      --surface-alt: #f4f4f2;
+      --hover: #e4e6ea;
+      --active: #dcdfe4;
+      --text: #1d1f23;
+      --muted: #777d86;
+      --border: #e0e1e4;
+      --button: #111111;
+      --button-text: #ffffff;
+      --danger: #d54848;
+      --success: #2f8f5b;
+    }
+
+    [data-theme="dark"] {
+      --app: #111315;
+      --sidebar: #181b1f;
+      --content: #101214;
+      --surface: #1c2025;
+      --surface-alt: #242930;
+      --hover: #262b32;
+      --active: #303640;
+      --text: #f3f4f6;
+      --muted: #a4a9b1;
+      --border: #31363e;
+      --button: #f3f4f6;
+      --button-text: #121416;
+      --danger: #ff7373;
+      --success: #7bd89f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--app);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      background: var(--app);
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 6px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #111;
+      color: #fff;
+      font-weight: 800;
+      background-size: cover;
+      background-position: center;
+      flex: 0 0 auto;
+    }
+
+    .username {
+      font-weight: 750;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .primary {
+      height: 44px;
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 700;
+      transition: transform .16s ease, background .16s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.04);
+    }
+
+    .primary:hover {
+      background: var(--hover);
+      transform: translateY(-1px);
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-item {
+      height: 42px;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text);
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      transition: background .16s ease;
+      text-align: left;
+    }
+
+    .nav-item:hover { background: var(--hover); }
+    .nav-item.active { background: var(--active); font-weight: 700; }
+    .nav-count { color: var(--muted); font-size: 13px; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .ghost {
+      height: 40px;
+      border-radius: 13px;
+      background: var(--surface);
+      color: var(--text);
+      transition: background .16s ease;
+    }
+
+    .ghost:hover { background: var(--hover); }
+
+    .content {
+      min-width: 0;
+      background: var(--content);
+      padding: 44px 54px 32px;
+      overflow: auto;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 12px 0 18px;
+      color: var(--muted);
+    }
+
+    .section-row {
+      display: grid;
+      grid-template-columns: 1fr 122px;
+      gap: 12px;
+      max-width: 760px;
+    }
+
+    .input {
+      height: 46px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 0 16px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: var(--active);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--active) 40%, transparent);
+    }
+
+    .black-button {
+      height: 46px;
+      border-radius: 14px;
+      background: var(--button);
+      color: var(--button-text);
+      font-weight: 800;
+      transition: transform .16s ease, opacity .16s ease;
+    }
+
+    .black-button:hover {
+      transform: translateY(-1px);
+      opacity: .88;
+    }
+
+    .sections {
+      margin-top: 18px;
+      display: grid;
+      gap: 18px;
+      max-width: 900px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      background: var(--active);
+      color: var(--text);
+      padding: 3px 9px;
+      font-size: 12px;
+    }
+
+    .section-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 6px;
+    }
+
+    .tiny {
+      height: 30px;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      padding: 0 10px;
+    }
+
+    .tiny:hover { background: var(--hover); color: var(--text); }
+    .tiny.danger { color: var(--danger); }
+
+    .task-list {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      padding: 10px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.04);
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 10px;
+      animation: rise .18s ease both;
+    }
+
+    .task:hover { background: var(--surface-alt); }
+
+    .check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: #fff;
+      display: grid;
+      place-items: center;
+    }
+
+    .task.done .check { background: var(--success); border-color: var(--success); }
+    .task.done .task-title { text-decoration: line-through; color: var(--muted); }
+
+    .meta {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty {
+      margin-top: 22px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      padding: 28px;
+      color: var(--muted);
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--text);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.32);
+      display: none;
+      place-items: center;
+      padding: 18px;
+      z-index: 10;
+    }
+
+    .modal.open { display: grid; }
+
+    .card {
+      width: min(460px, 100%);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 28px;
+      border: 1px solid var(--border);
+      box-shadow: 0 28px 90px rgba(0,0,0,.22);
+    }
+
+    .card h1, .card h2 {
+      margin: 0 0 8px;
+      letter-spacing: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 22px;
+    }
+
+    .registration {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: var(--app);
+    }
+
+    .registration .card { width: min(500px, 100%); }
+
+    .avatar-large {
+      width: 96px;
+      height: 96px;
+      font-size: 34px;
+      margin: 22px 0 14px;
+    }
+
+    .swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+
+    .swatch.selected {
+      border-color: var(--text);
+    }
+
+    .hidden { display: none; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+      }
+      .content {
+        padding: 28px 20px;
+      }
+      .section-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="root"></main>
+
+  <div class="modal" id="taskModal">
+    <form class="card" id="taskForm">
+      <h2 id="taskModalTitle">Vazifa qo'shish</h2>
+      <label class="field">Vazifa
+        <input class="input" id="taskTitle" required />
+      </label>
+      <label class="field">Sana (YYYY-MM-DD)
+        <input class="input" id="taskDue" placeholder="2026-05-11" />
+      </label>
+      <label class="field">Loyiha
+        <input class="input" id="taskProject" value="Inbox" />
+      </label>
+      <label class="field">Qism
+        <select class="input" id="taskSection"></select>
+      </label>
+      <div class="actions">
+        <button class="black-button" type="submit">Saqlash</button>
+        <button class="ghost" type="button" onclick="closeTaskModal()">Bekor qilish</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const storeKey = "unumli-web-state";
+    const avatarColors = ["#111111", "#4f46e5", "#0f766e", "#d97706", "#be123c", "#7c3aed"];
+    const navItems = [
+      ["Umumiy", "⌂"],
+      ["Bugungi", "○"],
+      ["Kelgusi", "◇"],
+      ["Bajarilgan", "✓"],
+      ["Loyihalarim", "□"],
+    ];
+
+    let state = loadState();
+    let activeNav = "Umumiy";
+    let editingTaskId = null;
+    let targetSectionId = null;
+
+    function uid() {
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem(storeKey);
+      if (saved) return JSON.parse(saved);
+      return {
+        theme: "light",
+        profile: { registered: false, name: "", avatarLetter: "T", avatarColor: "#111111", avatarImage: "" },
+        sections: [
+          { id: uid(), name: "Ish" },
+          { id: uid(), name: "Shaxsiy" }
+        ],
+        tasks: []
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(storeKey, JSON.stringify(state));
+    }
+
+    function render() {
+      document.documentElement.dataset.theme = state.theme;
+      if (!state.profile.registered) renderRegistration();
+      else renderApp();
+    }
+
+    function avatarStyle(size = 44) {
+      const image = state.profile.avatarImage;
+      const color = state.profile.avatarColor || "#111111";
+      return image
+        ? `width:${size}px;height:${size}px;background-image:url('${image}')`
+        : `width:${size}px;height:${size}px;background:${color}`;
+    }
+
+    function avatarText() {
+      return state.profile.avatarImage ? "" : (state.profile.avatarLetter || "T");
+    }
+
+    function renderRegistration() {
+      const root = document.getElementById("root");
+      root.innerHTML = `
+        <section class="registration">
+          <form class="card" id="registrationForm">
+            <div style="color:var(--muted);font-size:12px;font-weight:800">UNUMLI</div>
+            <h1>${state.profile.name ? "Profilingizni sozlang" : "Profilingizni yarating"}</h1>
+            <p style="color:var(--muted);margin:0">Ismingizni kiriting va kompyuterdan avatar tanlang.</p>
+            <div class="avatar avatar-large" id="avatarPreview" style="${avatarStyle(96)}">${avatarText()}</div>
+            <label class="field">Ismingiz
+              <input class="input" id="profileName" value="${escapeHtml(state.profile.name || "")}" required />
+            </label>
+            <label class="field">Avatar rasmi
+              <input class="input" id="avatarFile" type="file" accept="image/*" />
+            </label>
+            <div class="field">Avatar rangi
+              <div class="swatches">
+                ${avatarColors.map(color => `<button class="swatch ${color === state.profile.avatarColor ? "selected" : ""}" type="button" data-color="${color}" style="background:${color}"></button>`).join("")}
+              </div>
+            </div>
+            <div class="actions">
+              <button class="black-button" type="submit">Boshlash</button>
+              ${state.profile.registered ? `<button class="ghost" type="button" onclick="renderApp()">Bekor qilish</button>` : ""}
+            </div>
+          </form>
+        </section>
+      `;
+
+      document.querySelectorAll(".swatch").forEach(button => {
+        button.addEventListener("click", () => {
+          state.profile.avatarColor = button.dataset.color;
+          state.profile.avatarImage = "";
+          state.profile.avatarLetter = getLetter();
+          saveState();
+          renderRegistration();
+        });
+      });
+
+      document.getElementById("profileName").addEventListener("input", event => {
+        state.profile.name = event.target.value;
+        state.profile.avatarLetter = getLetter();
+        const preview = document.getElementById("avatarPreview");
+        if (!state.profile.avatarImage) preview.textContent = state.profile.avatarLetter;
+      });
+
+      document.getElementById("avatarFile").addEventListener("change", event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          state.profile.avatarImage = reader.result;
+          saveState();
+          renderRegistration();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById("registrationForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const name = document.getElementById("profileName").value.trim();
+        if (!name) return;
+        state.profile.name = name;
+        state.profile.avatarLetter = name.slice(0, 1).toUpperCase();
+        state.profile.registered = true;
+        saveState();
+        renderApp();
+      });
+    }
+
+    function getLetter() {
+      return (state.profile.name || "T").slice(0, 1).toUpperCase();
+    }
+
+    function renderApp() {
+      const root = document.getElementById("root");
+      root.innerHTML = `
+        <section class="app">
+          <aside class="sidebar">
+            <div class="profile">
+              <div class="avatar" style="${avatarStyle()}">${avatarText()}</div>
+              <div class="username">${escapeHtml(state.profile.name)}</div>
+            </div>
+            <button class="primary" onclick="openTaskModal()">+ Vazifa qo'shish</button>
+            <nav class="nav">
+              ${navItems.map(([name, icon]) => `
+                <button class="nav-item ${activeNav === name ? "active" : ""}" onclick="setNav('${name}')">
+                  <span>${icon}</span><span>${name}</span><span class="nav-count">${countFor(name)}</span>
+                </button>
+              `).join("")}
+            </nav>
+            <div class="sidebar-footer">
+              <button class="ghost" onclick="renderRegistration()">Profilni sozlash</button>
+              <button class="ghost" onclick="toggleTheme()">${state.theme === "dark" ? "Light mode" : "Dark mode"}</button>
+            </div>
+          </aside>
+          <section class="content">
+            <h1 class="title">${activeNav}</h1>
+            <p class="subtitle">Avval qism yarating:</p>
+            <form class="section-row" id="sectionForm">
+              <input class="input" id="sectionName" placeholder="Qism nomi" />
+              <button class="black-button">Yaratish</button>
+            </form>
+            <div class="sections">${renderSections()}</div>
+          </section>
+        </section>
+      `;
+
+      document.getElementById("sectionForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const input = document.getElementById("sectionName");
+        const name = input.value.trim();
+        if (!name) return;
+        state.sections.push({ id: uid(), name });
+        saveState();
+        renderApp();
+      });
+    }
+
+    function renderSections() {
+      const visible = visibleTasks();
+      const html = state.sections.map(section => {
+        const tasks = visible.filter(task => task.sectionId === section.id);
+        if (activeNav !== "Umumiy" && tasks.length === 0) return "";
+        return `
+          <article>
+            <div class="section-head">
+              <h2>${escapeHtml(section.name)}</h2>
+              <span class="pill">${tasks.length}</span>
+              <div class="section-actions">
+                <button class="tiny" onclick="openTaskModal('${section.id}')">+</button>
+                <button class="tiny" onclick="renameSection('${section.id}')">Rename</button>
+                <button class="tiny danger" onclick="deleteSection('${section.id}')">Delete</button>
+              </div>
+            </div>
+            <div class="task-list">
+              ${tasks.length ? tasks.map(renderTask).join("") : `<div class="empty"><strong>Hozircha vazifa yo'q</strong>Yangi vazifa qo'shing.</div>`}
+            </div>
+          </article>
+        `;
+      }).join("");
+      return html || `<div class="empty"><strong>Bu ko'rinishda vazifa yo'q</strong>Yangi qism yoki vazifa yarating.</div>`;
+    }
+
+    function renderTask(task) {
+      return `
+        <div class="task ${task.completed ? "done" : ""}">
+          <button class="check" onclick="toggleTask('${task.id}')">${task.completed ? "✓" : ""}</button>
+          <div>
+            <div class="task-title">${escapeHtml(task.title)}</div>
+            <div class="meta">${escapeHtml([task.project, task.dueDate].filter(Boolean).join(" · "))}</div>
+          </div>
+          <div>
+            <button class="tiny" onclick="editTask('${task.id}')">Edit</button>
+            <button class="tiny danger" onclick="deleteTask('${task.id}')">Del</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function visibleTasks() {
+      const t = today();
+      if (activeNav === "Bugungi") return state.tasks.filter(task => !task.completed && task.dueDate === t);
+      if (activeNav === "Kelgusi") return state.tasks.filter(task => !task.completed && (task.dueDate || "9999-99-99") > t);
+      if (activeNav === "Bajarilgan") return state.tasks.filter(task => task.completed);
+      return activeNav === "Umumiy" ? state.tasks.filter(task => !task.completed) : state.tasks;
+    }
+
+    function countFor(nav) {
+      const current = activeNav;
+      activeNav = nav;
+      const count = nav === "Loyihalarim" ? new Set(state.tasks.map(task => task.project)).size : visibleTasks().length;
+      activeNav = current;
+      return count;
+    }
+
+    function setNav(nav) {
+      activeNav = nav;
+      renderApp();
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      saveState();
+      render();
+    }
+
+    function openTaskModal(sectionId = null) {
+      if (!state.sections.length) state.sections.push({ id: uid(), name: "Inbox" });
+      editingTaskId = null;
+      targetSectionId = sectionId || state.sections[0].id;
+      fillTaskForm();
+      document.getElementById("taskModal").classList.add("open");
+    }
+
+    function editTask(id) {
+      editingTaskId = id;
+      const task = state.tasks.find(item => item.id === id);
+      targetSectionId = task.sectionId;
+      fillTaskForm(task);
+      document.getElementById("taskModalTitle").textContent = "Vazifani tahrirlash";
+      document.getElementById("taskModal").classList.add("open");
+    }
+
+    function fillTaskForm(task = {}) {
+      document.getElementById("taskModalTitle").textContent = task.id ? "Vazifani tahrirlash" : "Vazifa qo'shish";
+      document.getElementById("taskTitle").value = task.title || "";
+      document.getElementById("taskDue").value = task.dueDate || "";
+      document.getElementById("taskProject").value = task.project || "Inbox";
+      document.getElementById("taskSection").innerHTML = state.sections.map(section => `
+        <option value="${section.id}" ${section.id === (task.sectionId || targetSectionId) ? "selected" : ""}>${escapeHtml(section.name)}</option>
+      `).join("");
+    }
+
+    document.getElementById("taskForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const payload = {
+        title: document.getElementById("taskTitle").value.trim(),
+        dueDate: document.getElementById("taskDue").value.trim(),
+        project: document.getElementById("taskProject").value.trim() || "Inbox",
+        sectionId: document.getElementById("taskSection").value,
+      };
+      if (!payload.title) return;
+      if (editingTaskId) {
+        Object.assign(state.tasks.find(task => task.id === editingTaskId), payload);
+      } else {
+        state.tasks.push({ id: uid(), completed: false, ...payload });
+      }
+      saveState();
+      closeTaskModal();
+      renderApp();
+    });
+
+    function closeTaskModal() {
+      document.getElementById("taskModal").classList.remove("open");
+    }
+
+    function toggleTask(id) {
+      const task = state.tasks.find(item => item.id === id);
+      task.completed = !task.completed;
+      saveState();
+      renderApp();
+    }
+
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(task => task.id !== id);
+      saveState();
+      renderApp();
+    }
+
+    function renameSection(id) {
+      const section = state.sections.find(item => item.id === id);
+      const name = prompt("Yangi nom:", section.name);
+      if (!name || !name.trim()) return;
+      section.name = name.trim();
+      saveState();
+      renderApp();
+    }
+
+    function deleteSection(id) {
+      if (!confirm("Qism va ichidagi vazifalar o'chirilsinmi?")) return;
+      state.sections = state.sections.filter(section => section.id !== id);
+      state.tasks = state.tasks.filter(task => task.sectionId !== id);
+      saveState();
+      renderApp();
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      }[char]));
+    }
+
+    render();
+  </script>
+</body>
+</html>
