@@ -145,6 +145,31 @@
       gap: 8px;
     }
 
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 8;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 12px 32px rgba(0,0,0,.12);
+      border: 1px solid var(--border);
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      background: rgba(0,0,0,.34);
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+
     .ghost {
       height: 40px;
       border-radius: 13px;
@@ -398,14 +423,37 @@
       .app {
         grid-template-columns: 1fr;
       }
+
+      .menu-toggle {
+        display: grid;
+        place-items: center;
+      }
+
       .sidebar {
-        position: sticky;
+        position: fixed;
         top: 0;
-        z-index: 3;
+        left: 0;
+        z-index: 7;
+        width: min(82vw, 290px);
+        height: 100vh;
+        transform: translateX(-105%);
+        transition: transform .24s ease;
+        box-shadow: 24px 0 70px rgba(0,0,0,.24);
       }
+
+      .app.sidebar-open .sidebar {
+        transform: translateX(0);
+      }
+
+      .app.sidebar-open .sidebar-backdrop {
+        display: block;
+        opacity: 1;
+      }
+
       .content {
-        padding: 28px 20px;
+        padding: 78px 20px 28px;
       }
+
       .section-row {
         grid-template-columns: 1fr;
       }
@@ -452,6 +500,9 @@
     let activeNav = "Umumiy";
     let editingTaskId = null;
     let targetSectionId = null;
+    let sidebarOpen = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
     function uid() {
       return Math.random().toString(16).slice(2) + Date.now().toString(16);
@@ -573,7 +624,9 @@
     function renderApp() {
       const root = document.getElementById("root");
       root.innerHTML = `
-        <section class="app">
+        <section class="app ${sidebarOpen ? "sidebar-open" : ""}" id="appShell">
+          <button class="menu-toggle" onclick="openSidebar()" aria-label="Open menu">☰</button>
+          <div class="sidebar-backdrop" onclick="closeSidebar()"></div>
           <aside class="sidebar">
             <div class="profile">
               <div class="avatar" style="${avatarStyle()}">${avatarText()}</div>
@@ -613,6 +666,7 @@
         saveState();
         renderApp();
       });
+      setupSwipeMenu();
     }
 
     function renderSections() {
@@ -674,7 +728,45 @@
 
     function setNav(nav) {
       activeNav = nav;
+      sidebarOpen = false;
       renderApp();
+    }
+
+    function openSidebar() {
+      sidebarOpen = true;
+      renderApp();
+    }
+
+    function closeSidebar() {
+      sidebarOpen = false;
+      renderApp();
+    }
+
+    function setupSwipeMenu() {
+      const shell = document.getElementById("appShell");
+      if (!shell) return;
+
+      shell.addEventListener("touchstart", event => {
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
+
+      shell.addEventListener("touchend", event => {
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = Math.abs(touch.clientY - touchStartY);
+        if (deltaY > 80) return;
+
+        if (!sidebarOpen && touchStartX < 28 && deltaX > 60) {
+          openSidebar();
+          return;
+        }
+
+        if (sidebarOpen && deltaX < -60) {
+          closeSidebar();
+        }
+      }, { passive: true });
     }
 
     function toggleTheme() {
